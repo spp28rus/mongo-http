@@ -3,10 +3,21 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gofor-little/env"
 	"mongo_http/database"
 	httppackage "mongo_http/http"
 	"net/http"
 )
+
+var appPort string
+
+func init() {
+	if err := env.Load(".env"); err != nil {
+		panic(err)
+	}
+
+	appPort = env.Get("APP_PORT", "0")
+}
 
 func main() {
 	fmt.Println("Hello!")
@@ -166,5 +177,5 @@ func main() {
 		})
 	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(":" + appPort) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
