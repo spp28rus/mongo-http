@@ -73,5 +73,98 @@ func main() {
 		})
 	})
 
+	r.POST("/actions/distinct", func(ctx *gin.Context) {
+		var requestData httppackage.RequestDistinct
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		elements := database.Distinct(ctx, collection, requestData.FieldName, requestData.Filter)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"elements": elements,
+		})
+	})
+
+	r.POST("/actions/find", func(ctx *gin.Context) {
+		var requestData httppackage.RequestFind
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		elements := database.Find(ctx, collection, requestData.Filter)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"elements": elements,
+		})
+	})
+
+	r.POST("/actions/insertMany", func(ctx *gin.Context) {
+		var requestData httppackage.RequestInsertMany
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		insertedIDs := database.InsertMany(ctx, collection, requestData.Documents)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"insertedIDs": insertedIDs,
+		})
+	})
+
+	r.POST("/actions/deleteMany", func(ctx *gin.Context) {
+		var requestData httppackage.RequestDeleteMany
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		deletedCount := database.DeleteMany(ctx, collection, requestData.Filter)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"deletedCount": deletedCount,
+		})
+	})
+
+	r.POST("/actions/updateMany", func(ctx *gin.Context) {
+		var requestData httppackage.RequestUpdateMany
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		updateResult := database.UpdateMany(ctx, collection, requestData.Filter, requestData.Update)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"matched_count":  updateResult.MatchedCount,
+			"upserted_count": updateResult.UpsertedCount,
+			"modified_count": updateResult.ModifiedCount,
+			"upserted_id":    updateResult.UpsertedID,
+		})
+	})
+
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
