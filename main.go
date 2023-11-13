@@ -134,7 +134,7 @@ func main() {
 		insertedIDs := database.InsertMany(ctx, collection, requestData.Documents)
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"insertedIDs": insertedIDs,
+			"inserted_ids": insertedIDs,
 		})
 	})
 
@@ -152,7 +152,7 @@ func main() {
 		deletedCount := database.DeleteMany(ctx, collection, requestData.Filter)
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"deletedCount": deletedCount,
+			"deleted_count": deletedCount,
 		})
 	})
 

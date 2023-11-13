@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,7 +32,7 @@ func InsertOne(ctx *gin.Context, collection *mongo.Collection, data string) inte
 	return one.InsertedID
 }
 
-func Aggregate(ctx *gin.Context, collection *mongo.Collection, pipeline string) []interface{} {
+func Aggregate(ctx *gin.Context, collection *mongo.Collection, pipeline string) []bson.M {
 	pipelineInstance := PrepareArrayRawValue(pipeline)
 
 	cursor, err := collection.Aggregate(ctx, pipelineInstance)
@@ -40,15 +41,15 @@ func Aggregate(ctx *gin.Context, collection *mongo.Collection, pipeline string) 
 		panic(err)
 	}
 
-	var elements []interface{}
+	var docs []bson.M
 
-	err = cursor.All(ctx, &elements)
+	err = cursor.All(ctx, &docs)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return elements
+	return docs
 }
 
 func Distinct(ctx *gin.Context, collection *mongo.Collection, fieldName string, filter string) []interface{} {
@@ -63,7 +64,7 @@ func Distinct(ctx *gin.Context, collection *mongo.Collection, fieldName string, 
 	return elements
 }
 
-func Find(ctx *gin.Context, collection *mongo.Collection, filter string) []interface{} {
+func Find(ctx *gin.Context, collection *mongo.Collection, filter string) []bson.M {
 	filterInstance := PrepareObjectRawValue(filter)
 
 	cursor, err := collection.Find(ctx, filterInstance)
@@ -72,15 +73,15 @@ func Find(ctx *gin.Context, collection *mongo.Collection, filter string) []inter
 		panic(err)
 	}
 
-	var elements []interface{}
+	var docs []bson.M
 
-	err = cursor.All(ctx, &elements)
+	err = cursor.All(ctx, &docs)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return elements
+	return docs
 }
 
 func InsertMany(ctx *gin.Context, collection *mongo.Collection, documents string) []interface{} {
