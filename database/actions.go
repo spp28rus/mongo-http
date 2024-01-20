@@ -120,3 +120,21 @@ func UpdateMany(ctx *gin.Context, collection *mongo.Collection, filter string, u
 
 	return updateResult
 }
+
+func BulkWriteUpdateOne(ctx *gin.Context, collection *mongo.Collection, operations string) *mongo.BulkWriteResult {
+	operationsInstance := PrepareArrayOfArraysRawValue(operations)
+
+	var models []mongo.WriteModel
+
+	for _, element := range operationsInstance {
+		models = append(models, mongo.NewUpdateOneModel().SetFilter(element[0]).SetUpdate(element[1]))
+	}
+
+	bulkWriteResult, err := collection.BulkWrite(ctx, models)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return bulkWriteResult
+}

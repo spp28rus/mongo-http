@@ -49,3 +49,8 @@ type RequestUpdateMany struct {
 	Filter         string `json:"filter" binding:"required"`
 	Update         string `json:"update" binding:"required"`
 }
+type RequestBulkWriteUpdateOne struct {
+	DatabaseName   string `json:"database_name" binding:"required"`
+	CollectionName string `json:"collection_name" binding:"required"`
+	Operations     string `json:"operations" binding:"required"`
+}

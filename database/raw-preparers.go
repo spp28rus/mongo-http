@@ -23,3 +23,13 @@ func PrepareArrayRawValue(data string) []interface{} {
 
 	return valueInterface
 }
+
+func PrepareArrayOfArraysRawValue(data string) [][]interface{} {
+	var valueInterface [][]interface{}
+
+	if err := json.Unmarshal([]byte(data), &valueInterface); err != nil {
+		panic(err)
+	}
+
+	return valueInterface
+}

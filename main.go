@@ -177,5 +177,32 @@ func main() {
 		})
 	})
 
-	r.Run(":" + appPort) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.POST("/actions/bulkWrite/updateOne", func(ctx *gin.Context) {
+		var requestData httppackage.RequestBulkWriteUpdateOne
+
+		if err := ctx.ShouldBindJSON(&requestData); err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+
+			return
+		}
+
+		collection := database.GetMongoCollectionCollection(requestData.DatabaseName, requestData.CollectionName)
+
+		updateResult := database.BulkWriteUpdateOne(ctx, collection, requestData.Operations)
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"inserted_count": updateResult.InsertedCount,
+			"matched_count":  updateResult.MatchedCount,
+			"modified_count": updateResult.ModifiedCount,
+			"deleted_count":  updateResult.DeletedCount,
+			"upserted_count": updateResult.UpsertedCount,
+			"upserted_ids":   updateResult.UpsertedIDs,
+		})
+	})
+
+	err := r.Run(":" + appPort)
+
+	if err != nil {
+		panic(err)
+	}
 }
